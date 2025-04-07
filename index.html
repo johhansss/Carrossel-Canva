@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Preencher Carrossel do Canva</title>
+  <script src="https://sdk.canva.com/design-button/v2/sdk.js"></script>
+  <style>
+    body { font-family: sans-serif; background: #f9f9f9; padding: 2rem; }
+    textarea { width: 100%; height: 300px; font-size: 1rem; padding: 1rem; }
+    button { margin-top: 1rem; padding: 1rem; font-size: 1rem; cursor: pointer; }
+    pre { background: #eee; padding: 1rem; margin-top: 1rem; white-space: pre-wrap; word-wrap: break-word; }
+    .btn { display: inline-block; background: #673ab7; color: #fff; padding: 1rem 2rem; margin-top: 2rem; text-decoration: none; border-radius: 5px; border: none; }
+  </style>
+</head>
+<body>
+  <h1>Preencha seu carrossel</h1>
+  <p>Cole abaixo o conteúdo com nomes como <code>slide1_title</code>, <code>slide2_body</code>, etc.</p>
+  <textarea id="input"></textarea>
+  <button class="btn" onclick="aplicarTextoNoCanva()">Aplicar conteúdo no Canva</button>
+
+  <script>
+    async function aplicarTextoNoCanva() {
+      let input = document.getElementById("input").value;
+      let data;
+      try {
+        data = JSON.parse(input);
+      } catch (e) {
+        alert("JSON inválido. Verifique o conteúdo e tente novamente.");
+        return;
+      }
+
+      const app = await canva.init();
+      const design = app.design;
+      const pages = await design.getPages();
+
+      for (let i = 0; i < pages.length; i++) {
+        const page = pages[i];
+        const index = i + 1;
+        const campos = [
+          `slide${index}_body`,
+          `slide${index}_title`,
+          `slide${index}_subtitle`,
+          `slide${index}_text`
+        ];
+
+        const textElements = await page.getTextElements();
+
+        for (let j = 0; j < textElements.length; j++) {
+          const textElement = textElements[j];
+          const campo = campos[j];
+          if (data[campo]) {
+            await textElement.setText(data[campo]);
+          }
+        }
+      }
+
+      alert("Conteúdo aplicado com sucesso!");
+    }
+  </script>
+</body>
+</html>
